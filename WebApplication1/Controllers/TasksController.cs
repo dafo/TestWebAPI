@@ -147,6 +147,13 @@ namespace WebApplication1.Controllers
             return null;
         }
 
+        //DELETE: /{cutomer}
+        [HttpDelete("{customer}")]
+        public async Task<WebApplication1.Models.Task?> DeleteCustomer(string id)
+        {
+            return null;
+        }
+
         private bool TaskExists(int id)
         {
             return (_dbContext.Tasks?.Any(t => t.Id == id)).GetValueOrDefault();
