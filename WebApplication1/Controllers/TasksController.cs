@@ -119,6 +119,34 @@ namespace WebApplication1.Controllers
             return new Customer { Id = 1, Name = "Boris Petrov" };
         }
 
+        //PATCH: /{tasklist}/{task}
+        [HttpPatch("id")]
+        public async Task<WebApplication1.Models.Task?> PatchUpdateTask(int id, Task task)
+        {
+            if (id != task.Id)
+            {
+                return null;
+            }
+            _dbContext.Entry(task).State = EntityState.Modified;
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TaskExists(id))
+                {
+                    return null;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return null;
+        }
+
         private bool TaskExists(int id)
         {
             return (_dbContext.Tasks?.Any(t => t.Id == id)).GetValueOrDefault();
