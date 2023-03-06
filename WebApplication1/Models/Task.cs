@@ -1,8 +1,11 @@
-﻿namespace WebApplication1.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApplication1.Models
 {
     public class Task
     {
         public string Kind = "tasks#task";
+        [Key]
         public int Id { get; set; }
         public string? Title { get; set; }
         public string? Notes { get; set; }
