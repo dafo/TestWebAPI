@@ -33,9 +33,9 @@ namespace WebApplication1.Controllers
             return t;
         }
 
-        //POST: /{tasklist}
+        //POST: /task
         [HttpPost("task")]
-        public async Task<WebApplication1.Models.Task?> InsertTask(Task task)
+        public async Task<WebApplication1.Models.Task?> InsertTask([FromBody]Task task)
         {
             _dbContext.Tasks.Add(task);
             await _dbContext.SaveChangesAsync();
@@ -44,7 +44,7 @@ namespace WebApplication1.Controllers
         }
 
         //PUT: /{tasklist}/{task}
-        [HttpPut("id")]
+        [HttpPut("{tasklist}/{task}")]
         public async Task<WebApplication1.Models.Task?> UpdateTask(int id, Task task)
         {
             if (id != task.Id)
@@ -93,7 +93,7 @@ namespace WebApplication1.Controllers
             return null;
         }
 
-        //LIST: /{tasklist}/
+        //GET: /{tasklist}/
         [HttpGet("{tasklist}")]
         public async Task<ICollection<WebApplication1.Models.Task>> ListTasks(string tasklist, string status, bool deleted)
         {
@@ -112,16 +112,53 @@ namespace WebApplication1.Controllers
             return new List<Task> { t };
         }
 
-        //GET: /{task}/
-        [HttpGet("{task}/{id}/{name}")]
-        public async Task<Customer> GetCustomerFromTask(Task myTask)
+        //POST: /{id}
+        [HttpPost("{id}")]
+        public async Task<ICollection<WebApplication1.Models.Task>> AllTasks(string id)
+        {
+            if (_dbContext.Tasks == null)
+            {
+                return new List<Task>();
+            }
+
+            if (!_dbContext.Tasks.AsQueryable().Any())
+            {
+                return new List<Task>();
+            }
+
+            var t = _dbContext.Tasks.ToList();
+            return t;
+        }
+
+        //POST: /{parentId}
+        [HttpPost("{parentId}")]
+        public async Task<ICollection<WebApplication1.Models.Task>> TasksByParentId(string parentId)
+        {
+            if (_dbContext.Tasks == null)
+            {
+                return new List<Task>();
+            }
+
+            if (!_dbContext.Tasks.AsQueryable().Where(t => t.Parent == parentId).Any())
+            {
+                return new List<Task>();
+            }
+
+            var t = _dbContext.Tasks.AsQueryable().Where(t => t.Parent == parentId);
+
+            return t.ToList();
+        }
+
+        //GET: /{task}
+        [HttpGet("{task}")]
+        public async Task<Customer> GetCustomerFromTask(Task task)
         {
             return new Customer { Id = 1, Name = "Boris Petrov" };
         }
 
-        //PATCH: /{tasklist}/{task}
+        //PATCH: /{id}/{task}
         [HttpPatch("id")]
-        public async Task<WebApplication1.Models.Task?> PatchUpdateTask(int id, Task task)
+        public async Task<WebApplication1.Models.Task?> PatchUpdateTask(int id, [FromBody]Task task)
         {
             if (id != task.Id)
             {
@@ -147,8 +184,7 @@ namespace WebApplication1.Controllers
             return null;
         }
 
-        //DELETE: /{cutomer}
-        [HttpDelete("{customer}")]
+        [HttpDelete("{id}")]
         public async Task<WebApplication1.Models.Task?> DeleteCustomer(string id)
         {
             return null;
